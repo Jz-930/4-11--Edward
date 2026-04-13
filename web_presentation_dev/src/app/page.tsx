@@ -192,7 +192,7 @@ export default function Page() {
       <section id="verdict" className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32">
         <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
-            <SectionHead eyebrow="Executive Summary" title="核心结论：谨慎乐观" subtitle="建议以自有品牌直营模式切入GTA中高端现调茶饮市场。首店选址推荐大多伦多核心华人商圈，定价区间 $7.00–$8.50 CAD，在蜜雪冰城和霸王茶姬进入加拿大前抢占品类心智窗口。" />
+            <SectionHead eyebrow="Executive Summary" title="核心结论：谨慎乐观" subtitle="建议以引入国内品牌模式切入GTA中高端现调茶饮市场。首店选址推荐大多伦多核心华人商圈，定价区间 $7.00–$8.50 CAD，在蜜雪冰城和霸王茶姬进入加拿大前抢占品类心智窗口。" />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-16">
               <Metric label="加拿大珍珠奶茶市场" value="$1.5亿" unit="CAD" accent />

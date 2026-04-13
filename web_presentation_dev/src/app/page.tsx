@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ChevronDown, TrendingUp, Target, DollarSign, Clock, AlertTriangle, Shield, MapPin, Users, Zap, Store, ArrowRight, Download, FileText } from "lucide-react";
+import { ChevronDown, TrendingUp, Target, DollarSign, Clock, AlertTriangle, Shield, MapPin, Users, Zap, Store, ArrowRight, Download, FileText, Plus, Minus, HelpCircle } from "lucide-react";
 import { MarketSizeChart, GrowthChart, CompetitorChart, InvestmentChart, ScenarioChart } from "@/components/charts/AllCharts";
 
 /* ── Animation Helpers ── */
@@ -29,6 +30,119 @@ const SectionHead = ({ eyebrow, title, subtitle }: { eyebrow: string; title: str
   </motion.div>
 );
 
+/* ── FAQ Database and Component ── */
+const FAQ_DATA = [
+  {
+    q: "万锦 Hwy 7 走廊目标商圈的实际日均人流量是多少？",
+    a: "为什么要问：报告测算盈亏平衡线为 139 杯/日，对应需要门前约 2,000+ 人次经过。选址客流量是最核心的敏感变量，差 30% 就意味着亏损与盈利的分界。建议在正式签约前采取实地计数验证。"
+  },
+  {
+    q: "28 万 CAD 的标准店投资中，有多少是不可回收的沉没成本？",
+    a: "为什么要问：报告给出了投资总额和回本期，但没有详细讨论「止损线」。装修费和定制设备一旦投入基本不可回收，创业者需要明确最坏情况下的财务底线，并根据自身抗风险能力做出决断。"
+  },
+  {
+    q: "从中国进口的核心原料是否已确认符合 CFIA 食品安全标准？",
+    a: "为什么要问：加拿大对食品添加剂的允许清单与中国不同（如部分色素、增稠剂在加拿大被严格禁用），进口原料被扣关的案例并不罕见。需提前送检或要求中国工厂出具符合健康部认证的配料表。"
+  },
+  {
+    q: "如果霸王茶姬在 2027 年进入多伦多，你的品牌护城河是什么？",
+    a: "为什么要问：报告提出利用 2-3 年窗口期抢占品类心智，但资本雄厚的头部品牌入场可能比预计更早。需要提前想清楚与霸王茶姬在同样主打“原叶鲜萃”时，如何在本地化运营或私域流量上形成差异化防线。"
+  },
+  {
+    q: "蜜雪冰城如果低价入加，你的定位是否真的与低价圈「不重叠」？",
+    a: "为什么要问：当两个品牌杯单价差距达 2-3 倍时，部分价格敏感型消费者（尤其是学生群体）会显著迁移。不可低估极端低价战略对中高端品类潜在用户的分流效应。"
+  },
+  {
+    q: "冬季销量普遍下降 15%-25%，这 5 个月的现金流缺口如何应对？",
+    a: "为什么要问：如果基准情景 170 杯/日在冬季降至 128 杯——已低于 139 杯的盈亏线——这意味着冬季每个月都在亏损边缘游走。这要求在财务规划时必须预留充足的“过冬备用金”。"
+  },
+  {
+    q: "核心原料供应商的保障能力如何？本地采购与进口的比例是多少？",
+    a: "为什么要问：优质原叶茶的进口供应链比工业茶粉复杂得多。而鲜果供应在加拿大冬季面临成本翻倍的压力，这直接影响产品在终端的毛利表现，必须有备用的本地采购替代渠道。"
+  },
+  {
+    q: "「低糖」「原叶」等卖点如何让非华裔消费者准确理解并信任？",
+    a: "为什么要问：加拿大 Health Canada 对食品的健康声明（Health Claims）监管非常严格。不能在英文菜单上随意使用暗示医疗效果或无根据的“健康”宣传，这涉及营销的合法性及跨文化转化。"
+  },
+  {
+    q: "如果 12 个月后日均杯量始终低于盈亏线，止损决策标准是什么？",
+    a: "为什么要问：餐饮业初创期风险极高，不能陷入“不断追加投资期望回本”的沉没成本陷阱。需要合伙人在开店前就冷血地设定一个明确的、绝不打破的止损关店红线。"
+  },
+  {
+    q: "目标客群中非华裔占比期望达到多少？菜单翻译是否已完全本地化？",
+    a: "为什么要问：如果仅依赖华裔圈层，天花板极低（例如万锦市华人口占约 45%）。像“杨枝甘露”等专有名词，需要以母语者习惯的描述性方式重新翻译，才能激起西裔和非华裔亚裔群体的尝试欲。"
+  }
+];
+
+const FAQItem = ({ item, index, isOpen, onToggle }: { item: typeof FAQ_DATA[0], index: number, isOpen: boolean, onToggle: () => void }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="border border-white/5 bg-brand-panel/50 rounded-2xl overflow-hidden mb-3"
+    >
+      <button 
+        onClick={onToggle}
+        className="w-full text-left p-4 sm:p-5 flex items-start gap-3 sm:gap-4 hover:bg-white/5 transition-colors outline-none"
+      >
+        <span className="text-brand-gold font-mono font-bold mt-0.5 shrink-0">Q{index + 1}.</span>
+        <span className={`font-medium flex-1 pr-2 sm:pr-6 leading-relaxed text-sm sm:text-base transition-colors ${isOpen ? 'text-brand-gold' : 'text-white'}`}>{item.q}</span>
+        <span className="mt-0.5 shrink-0 text-slate-500">
+          {isOpen ? <Minus className="w-5 h-5 text-brand-gold" /> : <Plus className="w-5 h-5" />}
+        </span>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="px-5 pb-5 pt-2 pl-14 text-slate-400 text-sm leading-relaxed border-t border-white/5 flex gap-3">
+              <HelpCircle className="w-4 h-4 text-brand-teal mt-0.5 shrink-0" />
+              <span>{item.a}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+const FAQAccordion = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="mt-12 text-left">
+      {FAQ_DATA.map((item, index) => (
+        <FAQItem 
+          key={index} 
+          item={item} 
+          index={index} 
+          isOpen={openIndex === index}
+          onToggle={() => setOpenIndex(openIndex === index ? null : index)}
+        />
+      ))}
+      <div className="mt-8 text-center">
+        <a 
+          href="#download-section"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById('download-section')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="text-slate-500 text-sm hover:text-brand-gold transition-colors inline-flex items-center gap-2"
+        >
+          <FileText className="w-4 h-4" />
+          请前往下方获取完整的「进驻安省现调饮品行业 · 25个关键问题」原版 PDF
+        </a>
+      </div>
+    </div>
+  );
+};
+
 /* ═══════════════════════════════════════════════════════════
    PAGE
 ═══════════════════════════════════════════════════════════ */
@@ -38,14 +152,17 @@ export default function Page() {
 
       {/* ━━━━━━━━━━ HERO ━━━━━━━━━━ */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <Image src="/images/hero-bg.png" alt="" fill className="object-cover opacity-40" priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/60 via-transparent to-brand-dark z-[1]" />
+        <Image src="/images/hero-bg.webp" alt="" fill className="object-cover opacity-40 mix-blend-screen" priority />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/40 via-brand-dark/80 to-brand-dark z-[1]" />
+        
+        {/* Subtle tea leaf texture overlay for richness */}
+        <div className="absolute inset-0 z-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url(/images/texture-tea-leaves.webp)' }}></div>
 
         <motion.div className="relative z-10 text-center px-6 max-w-4xl" initial="hidden" animate="visible" variants={stagger}>
           <motion.p variants={fade} className="text-brand-gold tracking-[0.4em] uppercase text-xs font-bold mb-6">
             Feasibility Study · 2026
           </motion.p>
-          <motion.h1 variants={fade} className="text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight">
+          <motion.h1 variants={fade} className="text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight">
             安大略省现调饮品<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-amber-300">市场进入可行性研究</span>
           </motion.h1>
@@ -61,8 +178,8 @@ export default function Page() {
       </section>
 
       {/* ━━━━━━━━━━ VERDICT ━━━━━━━━━━ */}
-      <section id="verdict" className="relative py-28 px-6 md:px-16">
-        <div className="max-w-6xl mx-auto">
+      <section id="verdict" className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
             <SectionHead eyebrow="Executive Summary" title="核心结论：谨慎乐观" subtitle="建议以自有品牌直营模式切入GTA中高端现调茶饮市场。首店选址推荐万锦（Markham）Hwy 7 走廊，定价区间 $7.00–$8.50 CAD，在蜜雪冰城和霸王茶姬进入加拿大前抢占品类心智窗口。" />
 
@@ -106,11 +223,16 @@ export default function Page() {
           </motion.div>
         </div>
       </section>
-      <div className="section-divider" />
+      {/* ━━━━━━━━━━ DIVIDER: VERDICT -> MARKET ━━━━━━━━━━ */}
+      <div className="relative h-48 w-full overflow-hidden">
+        <Image src="/images/divider-market.webp" alt="" fill className="object-cover opacity-30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-transparent to-brand-dark" />
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark via-transparent to-brand-dark" />
+      </div>
 
       {/* ━━━━━━━━━━ MARKET ━━━━━━━━━━ */}
-      <section className="py-28 px-6 md:px-16">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
             <SectionHead eyebrow="Market Opportunity" title="市场的时与势" subtitle="加拿大现调饮品市场正处于从利基品类向主流生活方式饮品跃迁的关键拐点。Z世代、多元文化人口增长和健康趋势三大引擎驱动 6%–10% 的年增长率。" />
 
@@ -132,14 +254,14 @@ export default function Page() {
             {/* TAM→SAM→SOM Funnel */}
             <motion.div variants={fade} className="mb-16">
               <h3 className="text-white font-bold text-xl mb-8 text-center">从宏观市场到单店可获取量</h3>
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-3 w-full">
                 {[
                   { label: 'TAM — 加拿大珍珠奶茶市场', value: '$1.5 亿', width: '100%', color: 'bg-brand-gold/10 border-brand-gold/25' },
                   { label: '安省市场份额 (42%)', value: '$6,300 万', width: '72%', color: 'bg-brand-gold/15 border-brand-gold/30' },
                   { label: 'SAM — GTA 可服务市场', value: '$4,400 万', width: '52%', color: 'bg-brand-gold/20 border-brand-gold/40' },
                   { label: 'SOM — 新品牌 3 年内可获取', value: '$50–70 万', width: '28%', color: 'bg-brand-gold/30 border-brand-gold/50' },
                 ].map((item, i) => (
-                  <div key={i} style={{ width: item.width }} className={`border rounded-xl px-6 py-4 text-center transition-all hover:scale-[1.02] ${item.color}`}>
+                  <div key={i} style={{ "--md-w": item.width } as React.CSSProperties} className={`w-full md:w-[var(--md-w)] border rounded-xl px-4 sm:px-6 py-4 text-center transition-all hover:scale-[1.02] ${item.color}`}>
                     <p className="text-slate-300 text-xs mb-1">{item.label}</p>
                     <p className="text-white font-bold text-2xl font-mono">{item.value}</p>
                   </div>
@@ -170,12 +292,17 @@ export default function Page() {
       <div className="section-divider" />
 
       {/* ━━━━━━━━━━ CONSUMERS ━━━━━━━━━━ */}
-      <section className="py-28 px-6 md:px-16 bg-brand-navy/40">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image src="/images/section-consumer.webp" alt="" fill className="object-cover opacity-10 object-right" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/95 via-brand-navy/90 to-transparent" />
+        </div>
+        
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
             <SectionHead eyebrow="Target Audience" title="精准客群画像" />
 
-            <div className="grid md:grid-cols-4 gap-5 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-12">
               {[
                 { emoji: '🧋', title: '华裔年轻人', age: '18–35 岁', desc: '对中国新式茶饮有高度认知与情感联结，种子用户群体' },
                 { emoji: '🌏', title: '泛亚裔 Z 世代', age: '18–30 岁', desc: '受韩流/日本文化影响接受亚洲饮品，品牌偏好尚未固化' },
@@ -191,7 +318,7 @@ export default function Page() {
               ))}
             </div>
 
-            <motion.div variants={fade} className="grid md:grid-cols-3 gap-5">
+            <motion.div variants={fade} className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
               {[
                 { icon: <Zap className="w-5 h-5 text-brand-gold" />, stat: '30%–40%', desc: '饮品消费通过外卖平台（UberEats / DoorDash）完成' },
                 { icon: <TrendingUp className="w-5 h-5 text-brand-red" />, stat: '-15% ~ -25%', desc: '冬季（11–3月）销量季节性回落幅度' },
@@ -211,11 +338,56 @@ export default function Page() {
       </section>
       <div className="section-divider" />
 
+      {/* ━━━━━━━━━━ FLOATING ASSETS ━━━━━━━━━━ */}
+      {/* Boba 1: Large, slow, far right */}
+      <motion.div 
+        className="fixed top-1/4 right-[5%] w-64 h-64 z-0 opacity-40 pointer-events-none drop-shadow-2xl hidden sm:block"
+        animate={{ y: [0, -30, 0], rotate: [0, 8, -8, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <Image src="/images/accent-boba-transparent.webp" alt="" fill className="object-contain" />
+      </motion.div>
+      
+      {/* Boba 2: Medium, faster, lower left */}
+      <motion.div 
+        className="fixed top-3/4 left-[8%] w-40 h-40 z-0 opacity-25 pointer-events-none drop-shadow-xl"
+        animate={{ y: [0, -40, 0], rotate: [45, 60, 45], x: [0, 10, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      >
+        <Image src="/images/accent-boba-transparent.webp" alt="" fill className="object-contain" />
+      </motion.div>
+
+      {/* Boba 3: Small, subtle, high center-right */}
+      <motion.div 
+        className="fixed top-[15%] right-[30%] w-24 h-24 z-0 opacity-[0.15] pointer-events-none drop-shadow-lg"
+        animate={{ y: [0, -20, 0], rotate: [-20, 0, -20] }}
+        transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      >
+        <Image src="/images/accent-boba-transparent.webp" alt="" fill className="object-contain" />
+      </motion.div>
+
+      {/* Boba 4: Very large, extremely blurry, mid-left background */}
+      <motion.div 
+        className="fixed top-[45%] left-[-5%] w-[32rem] h-[32rem] z-0 opacity-15 pointer-events-none blur-xl hidden lg:block"
+        animate={{ y: [0, -50, 0], rotate: [0, -10, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+      >
+        <Image src="/images/accent-boba-transparent.webp" alt="" fill className="object-contain" />
+      </motion.div>
+
       {/* ━━━━━━━━━━ COMPETITION ━━━━━━━━━━ */}
-      <section className="py-28 px-6 md:px-16">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
-            <SectionHead eyebrow="Competitive Intelligence" title="竞争格局：出海潮与价格战前夜" subtitle="2024–2026 年是中国茶饮品牌集中出海北美的窗口期。多个品牌完成 IPO 融资后拥有充足的海外扩张资金，加拿大是多数品牌的下一站目标。" />
+            <div className="relative flex flex-col md:flex-row gap-8 mb-16 items-end">
+              <div className="flex-1">
+                <SectionHead eyebrow="Competitive Intelligence" title="竞争格局：出海潮与价格战前夜" subtitle="2024–2026 年是中国茶饮品牌集中出海北美的窗口期。多个品牌完成 IPO 融资后拥有充足的海外扩张资金，加拿大是多数品牌的下一站目标。" />
+              </div>
+              <motion.div variants={fade} className="relative w-full md:w-1/3 h-40 rounded-2xl overflow-hidden border border-white/5 mb-16 md:mb-0 hidden md:block">
+                <Image src="/images/section-competition.webp" alt="" fill className="object-cover opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-brand-dark/80 via-transparent to-brand-gold/20 mix-blend-overlay" />
+              </motion.div>
+            </div>
 
             {/* Scatter Plot */}
             <motion.div variants={fade} className="bg-brand-panel border border-white/5 rounded-2xl p-6 mb-12">
@@ -275,17 +447,17 @@ export default function Page() {
             {/* Price tiers */}
             <motion.div variants={fade}>
               <h3 className="text-white font-bold text-lg mb-5">定价分层策略</h3>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 {[
                   { tier: '超低价层', range: '$2–4', brands: '蜜雪冰城（潜在）', color: 'border-slate-600', bg: 'bg-slate-800/30' },
                   { tier: '大众层', range: '$5–6', brands: 'Chatime · CoCo · Kung Fu Tea', color: 'border-blue-500/30', bg: 'bg-blue-900/10' },
                   { tier: '中端层', range: '$7–8.5', brands: 'Gong Cha · The Alley · 本品牌定位 ✦', color: 'border-brand-gold/50', bg: 'bg-brand-gold/5' },
                   { tier: '高端层', range: '$9–14', brands: 'HEYTEA · Tiger Sugar', color: 'border-purple-500/30', bg: 'bg-purple-900/10' },
                 ].map((t, i) => (
-                  <div key={i} className={`border rounded-xl px-5 py-3 flex items-center gap-6 ${t.color} ${t.bg}`}>
-                    <span className="text-white font-bold w-20 text-sm">{t.tier}</span>
-                    <span className="text-brand-gold font-mono font-bold w-16">{t.range}</span>
-                    <span className="text-slate-400 text-sm">{t.brands}</span>
+                  <div key={i} className={`border rounded-xl px-4 md:px-5 py-3 md:py-4 flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-6 ${t.color} ${t.bg}`}>
+                    <span className="text-white font-bold md:w-20 text-sm">{t.tier}</span>
+                    <span className="text-brand-gold font-mono font-bold md:w-16">{t.range}</span>
+                    <span className="text-slate-400 text-xs md:text-sm">{t.brands}</span>
                   </div>
                 ))}
               </div>
@@ -296,8 +468,14 @@ export default function Page() {
       <div className="section-divider" />
 
       {/* ━━━━━━━━━━ FINANCIAL ━━━━━━━━━━ */}
-      <section className="py-28 px-6 md:px-16 bg-brand-navy/40">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32 bg-brand-navy/60 overflow-hidden">
+        {/* Abstract Financial background overlay */}
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-[0.08] mix-blend-screen pointer-events-none">
+           <Image src="/images/section-financial.webp" alt="" fill className="object-cover object-left" />
+           <div className="absolute inset-0 bg-gradient-to-l from-transparent to-brand-navy" />
+        </div>
+        
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
             <SectionHead eyebrow="Financial Blueprint" title="投资测算与盈利模型" subtitle="通过客流量转化法、竞品对标法、市场份额倒推法三种方法交叉验证。基准日均 170 杯，月营收 $4.13 万 CAD，约 33 个月回本。" />
 
@@ -315,7 +493,7 @@ export default function Page() {
             </div>
 
             {/* Scenario detail cards */}
-            <motion.div variants={fade} className="grid md:grid-cols-3 gap-5 mb-12">
+            <motion.div variants={fade} className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-12">
               {[
                 { name: '保守情景', cups: '120 杯/日', rev: '$2.65 万/月', margin: '-40.3%', color: 'text-brand-red', border: 'border-red-500/20', verdict: '持续亏损——生存底线以下' },
                 { name: '基准情景', cups: '170 杯/日', rev: '$4.13 万/月', margin: '+11.5%', color: 'text-brand-gold', border: 'border-brand-gold/30', verdict: '合理回本线，约 33 个月收回投资' },
@@ -334,7 +512,7 @@ export default function Page() {
             </motion.div>
 
             {/* Break-even callout */}
-            <motion.div variants={fade} className="bg-gradient-to-r from-brand-gold/10 to-transparent border border-brand-gold/20 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
+            <motion.div variants={fade} className="bg-gradient-to-r from-brand-gold/10 to-transparent border border-brand-gold/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-8">
               <div className="text-center md:text-left">
                 <p className="text-slate-400 text-xs tracking-widest uppercase mb-1">盈亏平衡点</p>
                 <p className="text-5xl font-bold text-brand-gold glow-gold">139 <span className="text-2xl text-slate-400">杯/日</span></p>
@@ -354,12 +532,18 @@ export default function Page() {
       <div className="section-divider" />
 
       {/* ━━━━━━━━━━ RISKS ━━━━━━━━━━ */}
-      <section className="py-28 px-6 md:px-16">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32">
+        {/* Risk dramatic background overlay */}
+        <div className="absolute inset-x-0 top-0 h-[400px] z-0">
+          <Image src="/images/section-risk.webp" alt="" fill className="object-cover opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/20 via-brand-dark/80 to-brand-dark" />
+        </div>
+        
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
             <SectionHead eyebrow="Risk Assessment" title="关键风险与防御机制" subtitle="62% 的加拿大餐厅在运营前两年内出现亏损或关闭。以下是最可能影响本项目成败的核心风险及对应策略。" />
 
-            <div className="grid md:grid-cols-3 gap-5 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-12">
               {[
                 { severity: '🔴 CRITICAL', title: '中国品牌集中进入潮', desc: '2026–2028 年多个资金雄厚品牌同期涌入安省，加剧竞争、推高租金、分流客群。', mitigation: '抢占品类心智窗口，2026 年底前首店开业建立先发优势。', border: 'border-red-500/30', bg: 'bg-red-950/20' },
                 { severity: '🔴 CRITICAL', title: '蜜雪冰城低价冲击', desc: '若以 $2–4 CAD 定价入加，中低端品牌面临毁灭性价格压力。', mitigation: '坚守中高端定位，以原叶品质和健康概念建立价格护城河。', border: 'border-red-500/30', bg: 'bg-red-950/20' },
@@ -378,7 +562,7 @@ export default function Page() {
             </div>
 
             {/* Other risks row */}
-            <motion.div variants={fade} className="grid md:grid-cols-2 gap-4">
+            <motion.div variants={fade} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               {[
                 { title: '运营与人力', desc: '安省最低工资持续上涨（2026: $17.95/hr），多品牌争夺有限茶饮师傅人才。', icon: <Users className="w-4 h-4" /> },
                 { title: '供应链安全', desc: '核心原料（珍珠/茶叶）依赖进口，港口拥堵或关税调整可能导致断供。', icon: <AlertTriangle className="w-4 h-4" /> },
@@ -400,12 +584,24 @@ export default function Page() {
       <div className="section-divider" />
 
       {/* ━━━━━━━━━━ EXPANSION ROADMAP ━━━━━━━━━━ */}
-      <section className="py-28 px-6 md:px-16 bg-brand-navy/40">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32 bg-brand-navy/40 overflow-hidden">
+        <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
-            <SectionHead eyebrow="Growth Roadmap" title="三阶段扩张蓝图" subtitle="每一家新店的开设都必须以前一家店的盈利为前提。核心原则：用品牌忠诚度和社区关系构建护城河，而非用门店数量对抗资本雄厚的竞争者。" />
+            <div className="flex justify-between items-end mb-16">
+               <SectionHead eyebrow="Growth Roadmap" title="三阶段扩张蓝图" subtitle="每一家新店的开设都必须以前一家店的盈利为前提。核心原则：用品牌忠诚度和社区关系构建护城河，而非用门店数量对抗资本雄厚的竞争者。" />
+            </div>
 
-            <div className="relative">
+            <div className="relative flex flex-col md:flex-row gap-12">
+              {/* Timeline graphic on the left/background */}
+              <div className="hidden md:block w-1/4 relative shrink-0">
+                 <div className="sticky top-32 h-[600px] rounded-3xl overflow-hidden border border-white/5 shadow-2xl shadow-brand-gold/10">
+                    <Image src="/images/section-roadmap.webp" alt="" fill className="object-cover" />
+                    <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-brand-navy/80 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand-navy/80 to-transparent" />
+                 </div>
+              </div>
+            
+              <div className="relative flex-1">
               {/* Vertical line */}
               <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-brand-gold via-brand-gold/50 to-transparent" />
 
@@ -442,14 +638,21 @@ export default function Page() {
                   </div>
                 </motion.div>
               ))}
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
-      <div className="section-divider" />
+
+      {/* ━━━━━━━━━━ DIVIDER: CTA ━━━━━━━━━━ */}
+      <div className="relative h-40 w-full overflow-hidden">
+        <Image src="/images/divider-cta.webp" alt="" fill className="object-cover opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-transparent to-brand-dark" />
+        <div className="absolute inset-0 bg-gradient-to-l from-brand-dark via-transparent to-brand-dark" />
+      </div>
 
       {/* ━━━━━━━━━━ NEXT STEPS ━━━━━━━━━━ */}
-      <section className="py-28 px-6 md:px-16">
+      <section className="py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.div variants={fade}>
@@ -465,19 +668,36 @@ export default function Page() {
                 { step: '制定开业营销方案', budget: '小红书 / IG / UberEats + DoorDash', icon: '04' },
                 { step: '聘请安省持牌会计师完成税务架构设计', budget: 'HST · 所得税 · 工资代扣', icon: '05' },
               ].map((a, i) => (
-                <motion.div key={i} variants={fade} className="flex items-center gap-4 bg-brand-panel border border-white/5 rounded-xl p-4 hover:border-brand-gold/20 transition-all">
-                  <span className="text-brand-gold font-mono font-bold text-lg w-8">{a.icon}</span>
+                <motion.div key={i} variants={fade} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-brand-panel border border-white/5 rounded-xl p-4 hover:border-brand-gold/20 transition-all">
+                  <span className="text-brand-gold font-mono font-bold text-lg sm:w-8">{a.icon}</span>
                   <div className="flex-1">
                     <p className="text-white font-medium text-sm">{a.step}</p>
-                    <p className="text-slate-500 text-xs">{a.budget}</p>
+                    <p className="text-slate-500 text-xs mt-1 sm:mt-0">{a.budget}</p>
                   </div>
                 </motion.div>
               ))}
             </div>
 
-            <motion.div variants={fade} className="bg-gradient-to-r from-brand-gold/10 via-brand-gold/5 to-transparent border border-brand-gold/20 rounded-2xl p-8">
+            {/* ━━━━━━━━━━ 25 QUESTIONS (TOP 10 SHARP FAQ) ━━━━━━━━━━ */}
+            <div className="relative overflow-hidden mb-16 pt-16 border-t border-white/5">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-[400px] bg-brand-teal/5 blur-[120px] rounded-full pointer-events-none" />
+              
+              <div className="relative z-10">
+                <motion.div variants={fade} className="mb-12">
+                  <span className="text-brand-gold text-xs font-bold tracking-[0.25em] uppercase">Critical Thinking</span>
+                  <h3 className="text-2xl md:text-4xl font-bold text-white mt-3 leading-tight">进驻前的 10 个灵魂拷问</h3>
+                  <p className="text-slate-400 mt-4 max-w-2xl mx-auto leading-relaxed text-sm">
+                    从研究报告中提炼出的十大尖锐战术与执行问题。在签署任何租赁意向书或投入资金前，团队必须对这些现实考验给出实质性的答案。
+                  </p>
+                </motion.div>
+                
+                <FAQAccordion />
+              </div>
+            </div>
+
+            <motion.div id="download-section" variants={fade} className="scroll-mt-8 bg-gradient-to-r from-brand-gold/10 via-brand-gold/5 to-transparent border border-brand-gold/20 rounded-2xl p-8">
               <p className="text-slate-400 text-sm mb-6">本报告基于三份独立调研的合并分析，数据截至 2026 年 4 月。完整数据模型、方法论细节与参考文献（60+）详见以下报告文件：</p>
-              <div className="grid gap-3 max-w-xl mx-auto">
+              <div className="grid gap-3 max-w-2xl mx-auto">
                 {[
                   { name: '安大略省饮品市场进入可行性研究报告（终版）', file: '/downloads/安大略省饮品市场进入可行性研究报告（终版）.pdf', size: '4.9 MB', desc: '完整版报告 · 含全部章节、数据模型与参考文献' },
                   { name: '安大略省饮品市场研究 · 执行摘要', file: '/downloads/安大略省饮品市场研究_执行摘要.pdf', size: '225 KB', desc: '高管摘要 · 适合快速决策阅读' },
@@ -487,16 +707,28 @@ export default function Page() {
                     key={i}
                     href={doc.file}
                     download
-                    className="group flex items-center gap-4 bg-brand-dark/60 border border-white/5 rounded-xl p-4 hover:border-brand-gold/30 hover:bg-brand-gold/5 transition-all"
+                    className="group flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-brand-dark/60 border border-white/5 rounded-xl p-4 hover:border-brand-gold/30 hover:bg-brand-gold/5 transition-all text-left"
                   >
-                    <div className="shrink-0 w-10 h-10 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center group-hover:bg-brand-gold/20 transition-colors">
-                      <FileText className="w-5 h-5 text-brand-gold" />
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                      <div className="shrink-0 w-10 h-10 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center group-hover:bg-brand-gold/20 transition-colors">
+                        <FileText className="w-5 h-5 text-brand-gold" />
+                      </div>
+                      <div className="flex-1 min-w-0 sm:hidden">
+                          <p className="text-white font-medium text-sm truncate group-hover:text-brand-gold transition-colors">{doc.name}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    
+                    <div className="flex-1 min-w-0 hidden sm:block">
                       <p className="text-white font-medium text-sm truncate group-hover:text-brand-gold transition-colors">{doc.name}</p>
-                      <p className="text-slate-500 text-xs mt-0.5">{doc.desc}</p>
+                      <p className="text-slate-500 text-xs mt-0.5 truncate">{doc.desc}</p>
                     </div>
-                    <div className="shrink-0 flex items-center gap-2">
+                    
+                    {/* Mobile Desc */}
+                    <div className="w-full sm:hidden">
+                        <p className="text-slate-500 text-xs mt-0.5">{doc.desc}</p>
+                    </div>
+
+                    <div className="shrink-0 flex items-center justify-between sm:justify-start w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t border-white/5 sm:border-0">
                       <span className="text-slate-600 text-xs">{doc.size}</span>
                       <Download className="w-4 h-4 text-slate-600 group-hover:text-brand-gold transition-colors" />
                     </div>

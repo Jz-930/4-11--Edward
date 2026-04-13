@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronDown, TrendingUp, Target, DollarSign, Clock, AlertTriangle, Shield, MapPin, Users, Zap, Store, ArrowRight, Download, FileText, Plus, Minus, HelpCircle } from "lucide-react";
@@ -33,7 +33,7 @@ const SectionHead = ({ eyebrow, title, subtitle }: { eyebrow: string; title: str
 /* ── FAQ Database and Component ── */
 const FAQ_DATA = [
   {
-    q: "万锦 Hwy 7 走廊目标商圈的实际日均人流量是多少？",
+    q: "核心商圈的实际日均人流量是多少？",
     a: "为什么要问：报告测算盈亏平衡线为 139 杯/日，对应需要门前约 2,000+ 人次经过。选址客流量是最核心的敏感变量，差 30% 就意味着亏损与盈利的分界。建议在正式签约前采取实地计数验证。"
   },
   {
@@ -70,7 +70,7 @@ const FAQ_DATA = [
   },
   {
     q: "目标客群中非华裔占比期望达到多少？菜单翻译是否已完全本地化？",
-    a: "为什么要问：如果仅依赖华裔圈层，天花板极低（例如万锦市华人口占约 45%）。像“杨枝甘露”等专有名词，需要以母语者习惯的描述性方式重新翻译，才能激起西裔和非华裔亚裔群体的尝试欲。"
+    a: "为什么要问：如果仅依赖华裔圈层，天花板极低（例如某典型华人社区华人口占约 45%）。像“杨枝甘露”等专有名词，需要以母语者习惯的描述性方式重新翻译，才能激起西裔和非华裔亚裔群体的尝试欲。"
   }
 ];
 
@@ -126,6 +126,9 @@ const FAQAccordion = () => {
           onToggle={() => setOpenIndex(openIndex === index ? null : index)}
         />
       ))}
+      <div style={{ display: 'none', pointerEvents: 'none' }} data-creator="Created by DME-Jiackey">
+        Created by DME-Jiackey
+      </div>
       <div className="mt-8 text-center">
         <a 
           href="#download-section"
@@ -147,8 +150,16 @@ const FAQAccordion = () => {
    PAGE
 ═══════════════════════════════════════════════════════════ */
 export default function Page() {
+  useEffect(() => {
+    // Hidden execution trace watermark
+    console.info("%c", "font-size: 1px;", "Created by DME-Jiackey");
+  }, []);
+
   return (
     <main className="bg-brand-dark text-white selection:bg-brand-gold/30">
+      <div style={{ display: 'none', position: 'absolute', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true" data-template="false" data-author="Created by DME-Jiackey">
+        Handcrafted by DME-Jiackey
+      </div>
 
       {/* ━━━━━━━━━━ HERO ━━━━━━━━━━ */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -181,7 +192,7 @@ export default function Page() {
       <section id="verdict" className="relative py-24 md:py-28 px-6 md:px-12 lg:px-20 2xl:px-32">
         <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
-            <SectionHead eyebrow="Executive Summary" title="核心结论：谨慎乐观" subtitle="建议以自有品牌直营模式切入GTA中高端现调茶饮市场。首店选址推荐万锦（Markham）Hwy 7 走廊，定价区间 $7.00–$8.50 CAD，在蜜雪冰城和霸王茶姬进入加拿大前抢占品类心智窗口。" />
+            <SectionHead eyebrow="Executive Summary" title="核心结论：谨慎乐观" subtitle="建议以自有品牌直营模式切入GTA中高端现调茶饮市场。首店选址推荐大多伦多核心华人商圈，定价区间 $7.00–$8.50 CAD，在蜜雪冰城和霸王茶姬进入加拿大前抢占品类心智窗口。" />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-16">
               <Metric label="加拿大珍珠奶茶市场" value="$1.5亿" unit="CAD" accent />
@@ -209,7 +220,7 @@ export default function Page() {
                 <MapPin className="w-8 h-8 text-brand-teal mb-4" />
                 <h3 className="text-white font-bold text-lg mb-2">首店选址</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">
-                  万锦 Hwy 7 走廊或列治文山——华人社区消费密度高、竞品覆盖度相对较低。标准店面积约 900 sqft。
+                  大多伦多核心华人商圈——华人社区消费密度高、竞品覆盖度相对较低。标准店面积约 900 sqft。
                 </p>
               </div>
               <div className="bg-brand-panel border border-white/5 rounded-2xl p-6">
@@ -566,7 +577,7 @@ export default function Page() {
               {[
                 { title: '运营与人力', desc: '安省最低工资持续上涨（2026: $17.95/hr），多品牌争夺有限茶饮师傅人才。', icon: <Users className="w-4 h-4" /> },
                 { title: '供应链安全', desc: '核心原料（珍珠/茶叶）依赖进口，港口拥堵或关税调整可能导致断供。', icon: <AlertTriangle className="w-4 h-4" /> },
-                { title: '合规与分区', desc: 'Markham Zoning By-law 对餐饮用途有具体规定，停车位需满足 1/160 sqft。', icon: <Shield className="w-4 h-4" /> },
+                { title: '合规与分区', desc: '目标区域 Zoning By-law 对餐饮用途有具体规定，停车位需满足 1/160 sqft。', icon: <Shield className="w-4 h-4" /> },
                 { title: '地缘政治', desc: '中国品牌可能面临消费者抵制。品牌叙事需本地化，菜单须适应多元文化口味。', icon: <AlertTriangle className="w-4 h-4" /> },
               ].map((r, i) => (
                 <div key={i} className="bg-brand-panel border border-white/5 rounded-xl p-4 flex items-start gap-3">
@@ -610,7 +621,7 @@ export default function Page() {
                   points: ['选址、装修、合规审批并开业 (0–6 个月)', '达到盈亏平衡线 139 杯/日 (6–12 个月)', '建立标准化 SOP 手册，稳定供应链', '核心 KPI：日均 ≥170 杯，连续 3 个月正现金流'],
                   highlight: '⚠ 首店未跑通则扩张必亡' },
                 { phase: 'Phase 2', time: '18 → 36 个月', title: '区域扩张：GTA 5–8 家直营', align: 'right',
-                  points: ['优先万锦其他节点、列治文山、North York', '建立区域中央厨房，COGS 从 25% 压至 22%', '会员体系 + 私域流量池，目标 3 万+ 会员', '引入区域经理，创始人转向品牌管理'],
+                  points: ['优先布局GTA其他核心节点、列治文山、North York', '建立区域中央厨房，COGS 从 25% 压至 22%', '会员体系 + 私域流量池，目标 3 万+ 会员', '引入区域经理，创始人转向品牌管理'],
                   highlight: undefined },
                 { phase: 'Phase 3', time: '36 个月 +', title: '混合扩张：直营 + 加盟跨省', align: 'left',
                   points: ['开放特许加盟（参考 Chatime 模式）', '加盟费 $293K–$480K，持续特许费 5%–6%', '探索渥太华、Waterloo、Hamilton 及 BC 省', '根据竞争态势动态调整——优先巩固而非铺量'],
@@ -663,7 +674,7 @@ export default function Page() {
             <div className="grid gap-3 text-left max-w-xl mx-auto mb-16">
               {[
                 { step: '完成品牌注册与安省公司注册', budget: '~$2,000–$5,000 CAD', icon: '01' },
-                { step: '启动 GTA 选址调研，获取至少 3 个候选铺面 LOI', budget: '万锦 Hwy 7 优先', icon: '02' },
+                { step: '启动 GTA 选址调研，获取至少 3 个候选铺面 LOI', budget: '高密度商圈优先', icon: '02' },
                 { step: '建立本地供应链联系（含 CFIA 检疫流程）', budget: '茶叶进口 + 杯具', icon: '03' },
                 { step: '制定开业营销方案', budget: '小红书 / IG / UberEats + DoorDash', icon: '04' },
                 { step: '聘请安省持牌会计师完成税务架构设计', budget: 'HST · 所得税 · 工资代扣', icon: '05' },
@@ -741,9 +752,10 @@ export default function Page() {
       </section>
 
       {/* ━━━━━━━━━━ FOOTER ━━━━━━━━━━ */}
-      <footer className="py-10 text-center text-slate-700 text-xs bg-[#050710] border-t border-white/5">
+      <footer className="py-10 text-center text-slate-700 text-xs bg-[#050710] border-t border-white/5 relative">
         <p className="tracking-widest uppercase">Ontario Beverage Market Feasibility Study</p>
         <p className="mt-1">© 2026 · Confidential</p>
+        <span style={{ position: 'absolute', opacity: 0, bottom: '-20px', left: '-20px', pointerEvents: 'none' }} aria-hidden="true">Created by DME-Jiackey</span>
       </footer>
     </main>
   );
